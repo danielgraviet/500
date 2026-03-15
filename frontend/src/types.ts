@@ -10,6 +10,7 @@ export interface AgentResult {
   rows_returned: number | null
   error: string | null
   sql_length?: number | null
+  sql?: string | null
 }
 
 export interface WinnerResult extends AgentResult {

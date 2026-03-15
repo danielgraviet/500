@@ -8,7 +8,8 @@
     "rows_returned": 10,
     "explain_cost": 10000,
     "score": 389.1,
-    "sql_length": 180
+    "sql_length": 180,
+    "sql": "-- Top 10 riders by number of trips completed in the previous calendar month\nWITH last_month_bounds AS (\n    SELECT\n        date('now', 'start of month', '-1 month') AS month_start,\n        date('now', 'start of month', '-1 day')   AS month_end\n),\ntrip_counts AS (\n    SELECT\n        t.rider_id,\n        COUNT(t.trip_id) AS trip_count\n    FROM trips t\n    CROSS JOIN last_month_bounds b\n    WHERE date(t.started_at) >= b.month_start\n      AND date(t.started_at) <= b.month_end\n    GROUP BY t.rider_id\n)\nSELECT\n    tc.rider_id,\n    r.plan,\n    r.member_since,\n    tc.trip_count\nFROM trip_counts tc\nJOIN riders r ON r.rider_id = tc.rider_id\nORDER BY tc.trip_count DESC\nLIMIT 10;"
   },
   {
     "sandbox_id": "solution_002",
@@ -19,7 +20,8 @@
     "rows_returned": 10,
     "explain_cost": 8000,
     "score": 412.5,
-    "sql_length": 150
+    "sql_length": 150,
+    "sql": "SELECT rider_id, COUNT(*) AS trip_count\nFROM trips\nWHERE started_at >= date('now','start of month','-1 month')\n  AND started_at <  date('now','start of month')\nGROUP BY rider_id\nORDER BY trip_count DESC\nLIMIT 10;"
   },
   {
     "sandbox_id": "solution_003",
@@ -30,7 +32,8 @@
     "rows_returned": 10,
     "explain_cost": 10000,
     "score": 371.2,
-    "sql_length": 210
+    "sql_length": 210,
+    "sql": "-- SAFETY: Read-only SELECT; no dynamic SQL; date range uses SQLite built-ins; LIMIT caps output.\nSELECT\n    t.rider_id,\n    COUNT(t.trip_id) AS trip_count\nFROM trips AS t\nWHERE\n    t.started_at >= date('now', 'start of month', '-1 month')\n    AND t.started_at <  date('now', 'start of month')\nGROUP BY\n    t.rider_id\nORDER BY\n    trip_count DESC,\n    t.rider_id   ASC\nLIMIT 10;"
   },
   {
     "sandbox_id": "solution_004",
@@ -41,7 +44,8 @@
     "rows_returned": 10,
     "explain_cost": 10000,
     "score": 345.8,
-    "sql_length": 240
+    "sql_length": 240,
+    "sql": "SELECT\n    r.rider_id,\n    COUNT(t.trip_id) AS trip_count\nFROM (\n    SELECT rider_id FROM riders\n) AS r\nINNER JOIN trips AS t\n    ON t.rider_id = r.rider_id\n    AND t.started_at >= date('now', 'start of month', '-1 month')\n    AND t.started_at <  date('now', 'start of month')\nGROUP BY r.rider_id\nORDER BY\n    trip_count DESC,\n    r.rider_id ASC\nLIMIT 10;"
   },
   {
     "sandbox_id": "solution_005",
@@ -52,6 +56,7 @@
     "rows_returned": null,
     "explain_cost": null,
     "score": 0,
-    "sql_length": 320
+    "sql_length": 320,
+    "sql": "SELECT\n    t.rider_id,\n    COUNT(*) AS trip_count\nFROM trips t\nWHERE t.started_at >= date('now', 'start of month', '-1 month')\n  AND t.started_at <  date('now', 'start of month')\nGROUP BY t.rider_id\nORDER BY trip_count DESC\nLIMIT 10;"
   }
 ]

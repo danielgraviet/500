@@ -91,6 +91,7 @@ async def run_competition(
         role, _ = _read_solution_file(path)
         _emit(Event(type=EventType.SANDBOX_START, sandbox_id=path.stem, role=role))
         result = await run_in_sandbox(daytona, path)
+        result["sql"] = _read_winner_sql(path.stem)
         completed["n"] += 1
         event_type = EventType.SANDBOX_DONE if result.get("passed") else EventType.SANDBOX_FAILED
         _emit(Event(
